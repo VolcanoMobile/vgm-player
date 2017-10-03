@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true">
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="8dp"
+        android:id="@+id/top_shadow"
+        android:background="@drawable/top_shadow"
+        app:layout_constraintBottom_toTopOf="@+id/controls"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <RelativeLayout
+        android:id="@+id/controls"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/bottom_controls_height"
+        android:background="?bottomControlsBackground"
+        android:orientation="horizontal"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/endText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="@dimen/end_text_margin"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+        <TextView
+            android:id="@+id/startText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="@dimen/end_text_margin"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+        <ImageButton
+            android:id="@+id/bottom_play_pause"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_play_arrow_black_48dp"
+            android:tintMode="src_in"
+            android:tint="@color/bt_accent"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"/>
+
+        <ImageView
+            android:id="@+id/prev"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_skip_previous_white_48dp"
+            android:layout_toLeftOf="@+id/bottom_play_pause"
+            android:layout_centerVertical="true"
+            android:tintMode="src_in"
+            android:tint="@color/bt_accent"/>
+
+        <ImageView
+            android:id="@+id/next"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_skip_next_white_48dp"
+            android:layout_toRightOf="@+id/bottom_play_pause"
+            android:layout_centerVertical="true"
+            android:tintMode="src_in"
+            android:tint="@color/bt_accent"/>
+
+    </RelativeLayout>
+
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/controls"
+        app:layout_constraintBottom_toTopOf="@+id/controls" />
+
+</android.support.constraint.ConstraintLayout>

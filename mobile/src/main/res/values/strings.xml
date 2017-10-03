@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2014 The Android Open Source Project
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<resources>
+
+    <string name="app_name" translatable="false">VGM Player</string>
+
+    <string name="error_no_metadata">Unable to retrieve metadata.</string>
+    <string name="random_queue_title">Random music</string>
+    <string name="queue_title">Queue</string>
+    <string name="error_loading_media">Error Loading Media</string>
+    <string name="open_content_drawer">Open the main menu</string>
+    <string name="close_content_drawer">Close the main menu</string>
+    <string name="drawer_allmusic_title">All Music</string>
+    <string name="search_queue_title">Search results</string>
+    <string name="no_search_results">No search results.</string>
+    <string name="loading">Loading…</string>
+
+    <string name="equalizer">Equalizer</string>
+    <string name="bass_boost">Bass Boost</string>
+    <string name="custom_preset">Custom Preset</string>
+    <string name="d_Hz" translatable="false">%1$d Hz</string>
+    <string name="s_kHz" translatable="false">%1$s kHz</string>
+
+    <string name="error_init_failed">Initialization failed.</string>
+    <string name="error_prepare_failed">Could not open file.</string>
+    <string name="error_unknown">Unknown error.</string>
+    <string name="error_no_vgm_files_found">No VGM files found on your SD card.</string>
+    <string name="error_root_folder_not_set">VGM root folder not set.</string>
+    <string name="root_not_set">folder not set</string>
+    <string name="scan_notification_title">VGM file scanner</string>
+
+    <string name="no_duration_time" translatable="false">n/a</string>
+    <string name="queue_subtitle_format" translatable="false">%1$s \u2022 %2$s</string>
+
+    <string name="play_next">Play next</string>
+    <string name="remove_item">Remove from queue</string>
+    <string name="add_to_queue">Add to queue</string>
+    <string name="delete">Delete…</string>
+    <string name="item_removed">\"%1$s\" removed from play queue.</string>
+
+    <string name="read_permission_rational">This application requires access to your external storage to scan and read your VGM files.</string>
+    <string name="write_delete_permission_rational">This application requires write access to your external storage to delete the VGM files.</string>
+
+    <string name="delete_success">File \"%1$s\" deleted</string>
+    <string name="delete_failed">Failed to delete file \"%1$s\"</string>
+
+    <string name="notification_channel" translatable="false">VGM_Player_Channel_ID</string>
+    <string name="notification_channel_description" translatable="false">Channel ID for VGM Player</string>
+
+    <string name="scanner_notification_channel" translatable="false">VGM_SANNER_Channel_ID</string>
+    <string name="scanner_notification_channel_description" translatable="false">Channel ID for VGM Scanner</string>
+</resources>

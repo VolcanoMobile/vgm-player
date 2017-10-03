@@ -1,0 +1,3 @@
+[submodule "mobile/src/main/cpp/vgmplay"]
+	path = mobile/src/main/cpp/vgmplay
+	url = https://github.com/VolcanoMobile/vgmplay

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="0dp"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/container_current"
+        android:layout_width="fill_parent"
+        android:layout_height="64dp"
+        android:layout_alignParentTop="true"
+        android:background="?topControlsBackground">
+
+        <View
+            android:id="@+id/center"
+            android:layout_centerVertical="true"
+            android:layout_width="fill_parent"
+            android:visibility="invisible"
+            android:layout_height="1dp" />
+
+        <ImageView
+            android:id="@+id/album_art"
+            android:layout_width="@dimen/playback_controls_albumart_size"
+            android:layout_height="@dimen/playback_controls_albumart_size"
+            android:layout_margin="8dp"
+            android:layout_alignParentLeft="true"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/ic_launcher"/>
+
+        <ViewSwitcher
+            android:id="@+id/play_pause_container"
+            android:layout_width="56dp"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true">
+
+            <ImageButton
+                android:id="@+id/play_pause"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_play_arrow_black_36dp"
+                android:tintMode="src_in"
+                android:tint="@color/bt_accent"
+                android:scaleType="fitCenter" />
+
+            <ImageButton
+                android:id="@+id/queue"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                android:scaleType="centerInside"
+                android:background="?selectableItemBackgroundBorderless"
+                android:src="?playingQueueButton"
+                android:layout_gravity="center"/>
+
+        </ViewSwitcher>
+
+        <TextView
+            android:id="@+id/title_view"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="8dp"
+            android:layout_above="@+id/center"
+            android:layout_toLeftOf="@+id/play_pause_container"
+            android:layout_toRightOf="@+id/album_art"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:layout_marginBottom="-3dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="?android:attr/textColorPrimary"/>
+
+        <TextView
+            android:id="@+id/subtitle_view"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/center"
+            android:layout_alignLeft="@+id/title_view"
+            android:layout_alignRight="@+id/title_view"
+            android:layout_toLeftOf="@+id/play_pause_container"
+            android:layout_toRightOf="@+id/album_art"
+            android:layout_marginTop="3dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
+
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+    <ImageButton
+        android:id="@+id/shuffle"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="8dp"
+        android:layout_alignParentRight="true"
+        android:layout_above="@+id/line3"
+        android:src="@drawable/ic_shuffle_white_36dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginBottom="8dp"
+        android:scaleType="centerInside"
+        android:background="?selectableItemBackgroundBorderless"/>
+
+    <ImageButton
+        android:id="@+id/repeat"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="8dp"
+        android:layout_alignParentLeft="true"
+        android:layout_above="@+id/line3"
+        android:src="@drawable/ic_repeat_white_36dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginBottom="8dp"
+        android:scaleType="centerInside"
+        android:background="?selectableItemBackgroundBorderless"/>
+
+    <FrameLayout
+        android:id="@+id/queue_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/container_current"/>
+
+    <View
+        android:background="?attr/dividerVertical"
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:layout_below="@+id/container_current"/>
+
+    <TextView
+        android:id="@+id/line3"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bottom_layout"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center_horizontal"
+        android:maxLines="1"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/secondary_text_dark"
+        android:shadowColor="@android:color/black"
+        android:shadowRadius="20" />
+
+    <FrameLayout
+        android:id="@+id/bottom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <include layout="@layout/bottom_controls_panel"/>
+
+    </FrameLayout>
+
+</RelativeLayout>

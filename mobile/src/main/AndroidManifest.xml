@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2014 The Android Open Source Project
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="net.volcanomobile.vgmplayer"
+    android:installLocation="auto">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <application
+        android:name="net.volcanomobile.vgmplayer.Application"
+        android:allowBackup="false"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme.Light">
+
+        <meta-data
+            android:name="net.volcanomobile.vgmplayer.utils.GlideModule"
+            android:value="GlideModule" />
+
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc" />
+
+        <activity
+            android:name=".ui.SplashActivity"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Main activity for music browsing on phone -->
+        <activity android:name=".ui.player.MusicPlayerActivity"
+            android:theme="@style/AppTheme.Light.OverlapSystemBar"
+            android:launchMode="singleTask">
+
+            <!-- Use this intent filter to get voice searches, like "Play The Beatles" -->
+            <intent-filter>
+                <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </activity>
+
+        <activity android:name=".ui.settings.SettingsActivity"
+            android:label="@string/settings"
+            android:parentActivityName="net.volcanomobile.vgmplayer.ui.player.MusicPlayerActivity"/>
+
+        <activity android:name=".ui.equalizer.EqualizerActivity"
+            android:label="@string/equalizer"
+            android:parentActivityName="net.volcanomobile.vgmplayer.ui.player.MusicPlayerActivity"/>
+        
+        <activity android:name=".ui.preview.AudioPreviewActivity"
+            android:theme="@style/MusicDialogTheme"
+            android:excludeFromRecents="true"
+            android:process=":preview"
+            android:taskAffinity=".preview"
+            android:allowTaskReparenting="false"
+            android:configChanges="screenSize|orientation">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.vgm"
+                    android:scheme="file" />
+
+                <data
+                    android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.vgz"
+                    android:scheme="file" />
+
+            </intent-filter>
+
+        </activity>
+
+        <!--
+             (OPTIONAL) use this meta data to override the theme from which Android Wear will
+             look for colors. Currently, only background color of the media cards can be set, via
+             colorPrimaryDark. If you don't set this custom theme, Android Wear will look
+             for colorPrimaryDark attribute in your application theme.
+        -->
+        <meta-data
+            android:name="com.google.android.wearable.media.theme"
+            android:resource="@style/WearTheme" />
+
+        <!-- Main music service, provides media browsing and media playback services to
+         consumers through MediaBrowserService and MediaSession. Consumers connect to it through
+         MediaBrowser (for browsing) and MediaController (for play session control) -->
+        <service
+            android:name=".service.MusicService"
+            android:exported="true"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
+
+        <service android:name=".service.MediaScannerService"
+            android:exported="false"/>
+
+        <service
+            android:name=".service.RemoteVGMScannerService"
+            android:exported="false"
+            android:process=":VGMScanner"/>
+
+        <!-- A receiver that will receive media buttons and send as
+            intents to your MediaBrowserServiceCompat implementation.
+            Required on pre-Lollipop. More information at
+            http://developer.android.com/reference/android/support/v4/media/session/MediaButtonReceiver.html -->
+        <receiver android:name="android.support.v4.media.session.MediaButtonReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+
+        <!-- (OPTIONAL) use this meta data to indicate which icon should be
+            used in Android Auto media notifications (for example, when the
+            music changes and the user is looking at another app) -->
+        <meta-data
+            android:name="com.google.android.gms.car.notification.SmallIcon"
+            android:resource="@drawable/ic_notification" />
+
+        <provider
+            android:name=".provider.AlbumContentProvider"
+            android:authorities="${applicationId}.albumarts"
+            android:exported="true"
+            android:label="MIDI Player Album Art Provider" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.provider.album_thumbs"
+            android:exported="false"
+            android:grantUriPermissions="true">
+
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/album_thumbs_provider" />
+
+        </provider>
+
+        <provider
+            android:name=".provider.SharedPreferencesContentProvider"
+            android:authorities="${applicationId}.shared_preferences"
+            android:exported="false"/>
+
+    </application>
+
+</manifest>

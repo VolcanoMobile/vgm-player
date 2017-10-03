@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="settings">Settings</string>
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_root_folder">VGM root folder</string>
+    <string name="pref_root_folder_key">root_folder</string>
+
+    <string name="pref_header_look_and_feel">Look And Feel</string>
+
+    <string name="pref_theme">Theme</string>
+    <string name="pref_theme_id_key">theme_id</string>
+
+    <string-array name="themes">
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+
+    <string-array name="themes_ids">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string name="pref_header_about">About</string>
+
+    <string name="pref_version">Version</string>
+    <string name="pref_version_key">version</string>
+
+    <string name="pref_developer">Developer</string>
+    <string name="pref_developer_key">developer</string>
+
+</resources>

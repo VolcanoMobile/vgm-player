@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2014 The Android Open Source Project
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="Base.AppTheme.Light" parent="Theme.AppCompat.Light">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeBackground">@color/primary</item>
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <item name="moreButtonTint">#323232</item>
+
+        <!-- NoActionBar -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Base.AppTheme.Dark" parent="Theme.AppCompat">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeBackground">@color/primary</item>
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <item name="moreButtonTint">#bebebe</item>
+
+        <!-- NoActionBar -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@drawable/background_splash</item>
+    </style>
+
+    <style name="AppTheme.Light" parent="Base.AppTheme.Light">
+        <item name="topControlsBackground">@color/cardview_light_background</item>
+        <item name="bottomControlsBackground">@color/controls_light_background</item>
+        <item name="playingQueueButton">@drawable/ic_queue_music_black_36dp</item>
+    </style>
+
+    <style name="AppTheme.Dark" parent="Base.AppTheme.Dark">
+        <item name="topControlsBackground">@color/cardview_dark_background</item>
+        <item name="bottomControlsBackground">@color/controls_dark_background</item>
+        <item name="playingQueueButton">@drawable/ic_queue_music_white_36dp</item>
+    </style>
+
+    <style name="AppTheme.Light.OverlapSystemBar">
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="AppTheme.Dark.OverlapSystemBar">
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="WearTheme" parent="AppTheme.Light">
+        <!-- colorPrimaryDark is currently used on Android Wear for:
+             - Card background on media browse
+             - Card background on 4-way media controls
+         -->
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+    </style>
+
+    <style name="MusicDialogTheme" parent="@style/Theme.AppCompat.Light.Dialog">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:windowMinWidthMajor">80%</item>
+        <item name="android:windowMinWidthMinor">100%</item>
+    </style>
+
+</resources>
