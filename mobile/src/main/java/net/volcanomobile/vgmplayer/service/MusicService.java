@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -460,7 +461,11 @@ public class MusicService extends MediaBrowserServiceCompat implements
         // The service needs to continue running even after the bound client (usually a
         // MediaController) disconnects, otherwise the music playback will stop.
         // Calling startService(Intent) will keep the service running until it is explicitly killed.
-        startService(new Intent(getApplicationContext(), MusicService.class));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(new Intent(getApplicationContext(), MusicService.class));
+        } else {
+            startService(new Intent(getApplicationContext(), MusicService.class));
+        }
     }
 
     /**
