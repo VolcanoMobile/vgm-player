@@ -292,10 +292,7 @@ public class MediaNotificationManager extends BroadcastReceiver {
         public void onMetadataChanged(MediaMetadataCompat metadata) {
             mCurrentMetadata = metadata;
             LogHelper.d(TAG, "Received new metadata ", metadata);
-            Notification notification = createNotification();
-            if (notification != null) {
-                mNotificationManager.notify(NOTIFICATION_ID, notification);
-            }
+            updateNotification();
         }
 
         @Override
