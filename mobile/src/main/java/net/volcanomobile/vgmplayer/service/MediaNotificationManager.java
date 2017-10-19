@@ -215,12 +215,11 @@ public class MediaNotificationManager extends BroadcastReceiver {
             } else if (newNotifyMode == NOTIFY_MODE_BACKGROUND) {
                 mNotificationManager.notify(NOTIFICATION_ID, createNotification());
             }
+            mNotifyMode = newNotifyMode;
         } else {
             mNotificationManager.cancel(NOTIFICATION_ID);
+            mNotifyMode = NOTIFY_MODE_NONE;
         }
-
-
-        mNotifyMode = newNotifyMode;
     }
 
     @Override
