@@ -23,6 +23,8 @@ extern bool EndPlay;
 extern UINT32 VGMMaxLoopM;
 extern UINT32 VGMMaxLoop;
 extern UINT32 FadeTime;
+
+extern CHIPS_OPTION ChipOpts[0x02];
 }
 
 // configuration.
@@ -47,8 +49,18 @@ Java_net_volcanomobile_vgmplayer_service_player_VgmPlayerInternal_nativeInit(JNI
 	FadeTime = 5000;
 	SampleRate = SAMPLE_RATE;
 
-	VGMPlay_Init();
-	VGMPlay_Init2();
+    VGMPlay_Init();
+
+    CHIP_OPTS* ym2612 = (CHIP_OPTS*)&ChipOpts[0x00] + 0x02; // YM2612
+    ym2612->EmuCore = 2; // Nuked OPN2
+
+    CHIP_OPTS* ymf262 = (CHIP_OPTS*)&ChipOpts[0x00] + 0x0C; // YMF262
+    ymf262->EmuCore = 1; // MAME
+
+    CHIP_OPTS* ym3812 = (CHIP_OPTS*)&ChipOpts[0x00] + 0x0C; // YM3812
+    ym3812->EmuCore = 1; // MAME
+
+    VGMPlay_Init2();
     return 0;
 }
 
