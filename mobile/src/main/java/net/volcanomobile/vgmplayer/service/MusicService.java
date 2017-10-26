@@ -38,20 +38,29 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.v7.media.MediaRouter;
 import android.text.TextUtils;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.google.android.gms.cast.framework.CastContext;
+import com.google.android.gms.cast.framework.CastSession;
+import com.google.android.gms.cast.framework.SessionManager;
+import com.google.android.gms.cast.framework.SessionManagerListener;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import net.volcanomobile.vgmplayer.Application;
 import net.volcanomobile.vgmplayer.BuildConfig;
 import net.volcanomobile.vgmplayer.R;
 import net.volcanomobile.vgmplayer.model.MusicProvider;
 import net.volcanomobile.vgmplayer.service.playback.LocalPlayback;
+import net.volcanomobile.vgmplayer.service.playback.Playback;
 import net.volcanomobile.vgmplayer.service.playback.PlaybackManager;
 import net.volcanomobile.vgmplayer.service.playback.QueueManager;
+import net.volcanomobile.vgmplayer.service.player.CastPlayback;
 import net.volcanomobile.vgmplayer.ui.player.MusicPlayerActivity;
 import net.volcanomobile.vgmplayer.utils.CarHelper;
 import net.volcanomobile.vgmplayer.utils.LogHelper;
@@ -128,6 +137,8 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     private static final String TAG = LogHelper.makeLogTag(MusicService.class);
 
+    // Extra on MediaSession that contains the Cast device name currently connected to
+    public static final String EXTRA_CONNECTED_CAST = BuildConfig.APPLICATION_ID + ".CAST_NAME";
     // The action of the incoming Intent indicating that it contains a command
     // to be executed (see {@link #onStartCommand})
     public static final String ACTION_CMD = BuildConfig.APPLICATION_ID + ".ACTION_CMD";
@@ -137,7 +148,10 @@ public class MusicService extends MediaBrowserServiceCompat implements
     // A value of a CMD_NAME key in the extras of the incoming Intent that
     // indicates that the music playback should be paused (see {@link #onStartCommand})
     public static final String CMD_PAUSE = "CMD_PAUSE";
-    public static final String CMD_RECREATE_PLAYER = "CMD_RECREATE_PLAYER";
+    // A value of a CMD_NAME key that indicates that the music playback should switch
+    // to local playback from cast playback.
+    public static final String CMD_STOP_CASTING = "CMD_STOP_CASTING";
+
     // Delay stopSelf by using a handler.
     private static final int STOP_DELAY = 120000;
 
@@ -154,7 +168,10 @@ public class MusicService extends MediaBrowserServiceCompat implements
     private MediaNotificationManager mMediaNotificationManager;
     private Bundle mSessionExtras;
     private final DelayedStopHandler mDelayedStopHandler = new DelayedStopHandler(this);
+    private MediaRouter mMediaRouter;
     private PackageValidator mPackageValidator;
+    private SessionManager mCastSessionManager;
+    private SessionManagerListener<CastSession> mCastSessionManagerListener;
 
     private MediaMetadataCompat mCurrentMetadata;
     private Bitmap mCurrentArtBitmap;
@@ -279,6 +296,18 @@ public class MusicService extends MediaBrowserServiceCompat implements
             throw new IllegalStateException("Could not create a MediaNotificationManager", e);
         }
 
+        int playServicesAvailable =
+                GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
+
+        if (playServicesAvailable == ConnectionResult.SUCCESS) {
+            mCastSessionManager = CastContext.getSharedInstance(this).getSessionManager();
+            mCastSessionManagerListener = new CastSessionManagerListener();
+            mCastSessionManager.addSessionManagerListener(mCastSessionManagerListener,
+                    CastSession.class);
+        }
+
+        mMediaRouter = MediaRouter.getInstance(getApplicationContext());
+
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mRootChangedBroadcastReceiver, ROOT_CHANGED_FILTER);
     }
@@ -296,10 +325,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
             if (ACTION_CMD.equals(action)) {
                 if (CMD_PAUSE.equals(command)) {
                     mPlaybackManager.handlePauseRequest();
-                } else if (CMD_RECREATE_PLAYER.equals(command)) {
-                    mPlaybackManager.updatePlaybackState(null);
-                    LocalPlayback playback = new LocalPlayback(MusicService.this, mMusicProvider);
-                    mPlaybackManager.switchToPlayback(playback, true);
+                } else if (CMD_STOP_CASTING.equals(command)) {
                 }
             } else {
                 // Try to handle the intent as a media button event wrapped by MediaButtonReceiver
@@ -314,6 +340,16 @@ public class MusicService extends MediaBrowserServiceCompat implements
         return START_NOT_STICKY;
     }
 
+    /*
+     * Handle case when user swipes the app away from the recents apps list by
+     * stopping the service (and any ongoing playback).
+     */
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        stopSelf();
+    }
+
     /**
      * (non-Javadoc)
      *
@@ -324,8 +360,14 @@ public class MusicService extends MediaBrowserServiceCompat implements
         LogHelper.d(TAG, "onDestroy");
 
         // Service is being killed, so make sure we release our resources
-        mMediaNotificationManager.stopNotification();
         mPlaybackManager.handleStopRequest(null);
+        mMediaNotificationManager.stopNotification();
+
+        if (mCastSessionManager != null) {
+            mCastSessionManager.removeSessionManagerListener(mCastSessionManagerListener,
+                    CastSession.class);
+        }
+
         mDelayedStopHandler.removeCallbacksAndMessages(null);
         mSession.release();
 
@@ -553,6 +595,86 @@ public class MusicService extends MediaBrowserServiceCompat implements
                 LogHelper.d(TAG, "Stopping service with delay handler.");
                 service.stopSelf();
             }
+        }
+    }
+
+    /**
+     * Session Manager Listener responsible for switching the Playback instances
+     * depending on whether it is connected to a remote player.
+     */
+    private class CastSessionManagerListener implements SessionManagerListener<CastSession> {
+
+        @Override
+        public void onSessionEnded(CastSession session, int error) {
+            LogHelper.d(TAG, "onSessionEnded");
+            mSessionExtras.remove(EXTRA_CONNECTED_CAST);
+            mSession.setExtras(mSessionExtras);
+            Playback playback = new LocalPlayback(MusicService.this, mMusicProvider);
+            mMediaRouter.setMediaSessionCompat(null);
+            mPlaybackManager.switchToPlayback(playback, false);
+        }
+
+        @Override
+        public void onSessionResumed(CastSession session, boolean wasSuspended) {
+            LogHelper.d(TAG, "onSessionResumed");
+            if (!wasSuspended) {
+                // In case we are casting, send the device name as an extra on MediaSession metadata.
+                mSessionExtras.putString(EXTRA_CONNECTED_CAST,
+                        session.getCastDevice().getFriendlyName());
+                mSession.setExtras(mSessionExtras);
+                // Now we can switch to CastPlayback
+                Playback playback = new CastPlayback(mMusicProvider, MusicService.this);
+                mMediaRouter.setMediaSessionCompat(mSession);
+                mPlaybackManager.switchToPlayback(playback, true);
+            }
+        }
+
+        @Override
+        public void onSessionStarted(CastSession session, String sessionId) {
+            LogHelper.d(TAG, "onSessionStarted");
+            // In case we are casting, send the device name as an extra on MediaSession metadata.
+            mSessionExtras.putString(EXTRA_CONNECTED_CAST,
+                    session.getCastDevice().getFriendlyName());
+            mSession.setExtras(mSessionExtras);
+            // Now we can switch to CastPlayback
+            Playback playback = new CastPlayback(mMusicProvider, MusicService.this);
+            mMediaRouter.setMediaSessionCompat(mSession);
+            mPlaybackManager.switchToPlayback(playback, true);
+        }
+
+        @Override
+        public void onSessionStarting(CastSession session) {
+            LogHelper.d(TAG, "onSessionStarting");
+        }
+
+        @Override
+        public void onSessionStartFailed(CastSession session, int error) {
+            LogHelper.d(TAG, "onSessionStartFailed");
+        }
+
+        @Override
+        public void onSessionEnding(CastSession session) {
+            LogHelper.d(TAG, "onSessionEnding");
+            // This is our final chance to update the underlying stream position
+            // In onSessionEnded(), the underlying CastPlayback#mRemoteMediaClient
+            // is disconnected and hence we update our local value of stream position
+            // to the latest position.
+            mPlaybackManager.getPlayback().updateLastKnownStreamPosition();
+        }
+
+        @Override
+        public void onSessionResuming(CastSession session, String sessionId) {
+            LogHelper.d(TAG, "onSessionResuming");
+        }
+
+        @Override
+        public void onSessionResumeFailed(CastSession session, int error) {
+            LogHelper.d(TAG, "onSessionResumeFailed");
+        }
+
+        @Override
+        public void onSessionSuspended(CastSession session, int reason) {
+            LogHelper.d(TAG, "onSessionSuspended");
         }
     }
 }

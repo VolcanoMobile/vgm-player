@@ -152,7 +152,7 @@
             android:name=".provider.AlbumContentProvider"
             android:authorities="${applicationId}.albumarts"
             android:exported="true"
-            android:label="MIDI Player Album Art Provider" />
+            android:label="VGM Player Album Art Provider" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -170,6 +170,11 @@
             android:name=".provider.SharedPreferencesContentProvider"
             android:authorities="${applicationId}.shared_preferences"
             android:exported="false"/>
+
+        <!-- (REQUIRED) use this meta data to to declare the app OptionsProvider. -->
+        <meta-data
+            android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
+            android:value="net.volcanomobile.vgmplayer.CastOptionsProvider" />
 
     </application>
 

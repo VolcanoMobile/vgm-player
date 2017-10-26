@@ -111,6 +111,11 @@ public class LocalPlayback implements Playback {
     }
 
     @Override
+    public void setState(int state) {
+        // Nothing to do (mExoPlayer holds its own state).
+    }
+
+    @Override
     public int getState() {
         if (mMidiPlayer == null) {
             return PlaybackStateCompat.STATE_STOPPED;
@@ -144,6 +149,11 @@ public class LocalPlayback implements Playback {
     @Override
     public long getCurrentStreamPosition() {
         return mMidiPlayer != null ? mMidiPlayer.getCurrentPosition() : 0;
+    }
+
+    @Override
+    public void updateLastKnownStreamPosition() {
+        // Nothing to do. Position maintained by ExoPlayer.
     }
 
     @Override
