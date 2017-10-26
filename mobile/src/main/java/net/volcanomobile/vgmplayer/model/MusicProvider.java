@@ -45,12 +45,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
-import io.reactivex.functions.BiFunction;
-import io.reactivex.functions.Function;
 import io.reactivex.observers.ResourceSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -93,35 +90,20 @@ public class MusicProvider {
     }
 
     public void deleteMusic(@NonNull final String musicId) {
-        Single.fromCallable(new Callable<MediaWithAlbum>() {
-            @Override
-            public MediaWithAlbum call() throws Exception {
-                return mMediaDao.loadById(Long.valueOf(musicId));
-            }
-        }).subscribeOn(Schedulers.io()).subscribe(new ResourceSingleObserver<MediaWithAlbum>() {
+        Single.fromCallable(() -> mMediaDao.loadById(Long.valueOf(musicId))).subscribeOn(Schedulers.io()).subscribe(new ResourceSingleObserver<MediaWithAlbum>() {
             @Override
             public void onSuccess(@io.reactivex.annotations.NonNull MediaWithAlbum mediaWithAlbum) {
                 final File file = new File(Uri.parse(mediaWithAlbum.getData()).getPath());
 
                 if (file.delete()) {
-                    Handlers.runOnMainThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(mContext, mContext.getString(R.string.delete_success, file.getName()), Toast.LENGTH_LONG).show();
-                        }
-                    });
+                    Handlers.runOnMainThread(() -> Toast.makeText(mContext, mContext.getString(R.string.delete_success, file.getName()), Toast.LENGTH_LONG).show());
                     mMediaDao.deleteById(mediaWithAlbum.getUid());
                     List<MediaWithAlbum> medias = mMediaDao.loadByAlbumIds(mediaWithAlbum.getAlbumId()).blockingFirst();
                     if(medias.size() == 0) {
                         mAlbumDao.deleteById(mediaWithAlbum.getAlbumId());
                     }
                 } else {
-                    Handlers.runOnMainThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(mContext, mContext.getString(R.string.delete_failed, file.getPath()), Toast.LENGTH_LONG).show();
-                        }
-                    });
+                    Handlers.runOnMainThread(() -> Toast.makeText(mContext, mContext.getString(R.string.delete_failed, file.getPath()), Toast.LENGTH_LONG).show());
                 }
                 dispose();
             }
@@ -138,19 +120,16 @@ public class MusicProvider {
      */
     public Single<List<MediaMetadataCompat>> getShuffledMusic() {
         return mMediaDao.loadRandom()
-                .map(new Function<List<MediaWithAlbum>, List<MediaMetadataCompat>>() {
-                    @Override
-                    public List<MediaMetadataCompat> apply(@io.reactivex.annotations.NonNull List<MediaWithAlbum> mediaWithAlbumList) throws Exception {
-                        List<MediaMetadataCompat> medias = new ArrayList<>();
+                .map(mediaWithAlbumList -> {
+                    List<MediaMetadataCompat> medias = new ArrayList<>();
 
-                        for(MediaWithAlbum media : mediaWithAlbumList) {
-                            medias.add(buildMediaMetadata(media));
-                        }
-
-                        return medias;
+                    for(MediaWithAlbum media : mediaWithAlbumList) {
+                        medias.add(buildMediaMetadata(media));
                     }
+
+                    return medias;
                 })
-                .first(new ArrayList<MediaMetadataCompat>(0));
+                .first(new ArrayList<>(0));
     }
 
     /**
@@ -160,34 +139,28 @@ public class MusicProvider {
      */
     public Single<List<MediaMetadataCompat>> searchMusicBySongTitle(@NonNull final String query) {
         return mMediaDao.loadByTitleSearch('%' + query + '%')
-                .map(new Function<List<MediaWithAlbum>, List<MediaMetadataCompat>>() {
-                    @Override
-                    public List<MediaMetadataCompat> apply(@io.reactivex.annotations.NonNull List<MediaWithAlbum> mediaWithAlbumList) throws Exception {
-                        List<MediaMetadataCompat> medias = new ArrayList<>();
+                .map(mediaWithAlbumList -> {
+                    List<MediaMetadataCompat> medias = new ArrayList<>();
 
-                        for(MediaWithAlbum media : mediaWithAlbumList) {
-                            medias.add(buildMediaMetadata(media));
-                        }
-
-                        return medias;
+                    for(MediaWithAlbum media : mediaWithAlbumList) {
+                        medias.add(buildMediaMetadata(media));
                     }
+
+                    return medias;
                 })
-                .first(new ArrayList<MediaMetadataCompat>(0));
+                .first(new ArrayList<>(0));
     }
 
     public Single<List<MediaMetadataCompat>> searchMusicByFolder(@NonNull final String folder) {
         return mMediaDao.loadByFolder(folder)
-                .map(new Function<List<MediaWithAlbum>, List<MediaMetadataCompat>>() {
-                    @Override
-                    public List<MediaMetadataCompat> apply(@io.reactivex.annotations.NonNull List<MediaWithAlbum> mediaWithAlbumList) throws Exception {
-                        List<MediaMetadataCompat> musics = new ArrayList<>();
+                .map(mediaWithAlbumList -> {
+                    List<MediaMetadataCompat> musics = new ArrayList<>();
 
-                        for(MediaWithAlbum media : mediaWithAlbumList) {
-                            musics.add(buildMediaMetadata(media));
-                        }
-
-                        return musics;
+                    for(MediaWithAlbum media : mediaWithAlbumList) {
+                        musics.add(buildMediaMetadata(media));
                     }
+
+                    return musics;
                 })
                 .firstOrError();
     }
@@ -199,36 +172,24 @@ public class MusicProvider {
      */
     @NonNull
     public Single<MediaMetadataCompat> getMusic(final @NonNull String musicId) {
-        return Single.fromCallable(new Callable<MediaWithAlbum>() {
-            @Override
-            public MediaWithAlbum call() throws Exception {
-                return mMediaDao.loadById(Long.valueOf(musicId));
-            }
-        }).map(new Function<MediaWithAlbum, MediaMetadataCompat>() {
-            @Override
-            public MediaMetadataCompat apply(@io.reactivex.annotations.NonNull MediaWithAlbum mediaWithAlbum) throws Exception {
-                return buildMediaMetadata(mediaWithAlbum);
-            }
-        });
+        return Single.fromCallable(() -> mMediaDao.loadById(Long.valueOf(musicId)))
+                .map(this::buildMediaMetadata);
     }
 
     private Flowable<List<String>> getSubFolders(final String parent) {
         return mAlbumDao.loadAlbumFolderByParent(parent + "/%")
-                .map(new Function<List<String>, List<String>>() {
-                    @Override
-                    public List<String> apply(@io.reactivex.annotations.NonNull List<String> folders) throws Exception {
-                        List<String> result = new ArrayList<>();
+                .map(folders -> {
+                    List<String> result = new ArrayList<>();
 
-                        for(String folder : folders) {
-                            String relative = getDirectSubFolder(parent, folder);
-                            if (!result.contains(relative)) {
-                                result.add(relative);
-                            }
+                    for(String folder : folders) {
+                        String relative = getDirectSubFolder(parent, folder);
+                        if (!result.contains(relative)) {
+                            result.add(relative);
                         }
-
-                        return result;
-
                     }
+
+                    return result;
+
                 });
     }
 
@@ -262,23 +223,18 @@ public class MusicProvider {
                 return Flowable.combineLatest(
                         getSubFolders(folder),
                         getMusicsByFolder(folder),
-                        new BiFunction<List<String>, List<MediaWithAlbum>, List<MediaBrowserCompat.MediaItem>>() {
-                            @Override
-                            public List<MediaBrowserCompat.MediaItem> apply(
-                                    @io.reactivex.annotations.NonNull List<String> strings,
-                                    @io.reactivex.annotations.NonNull List<MediaWithAlbum> mediaWithAlbumList) throws Exception {
-                                List<MediaBrowserCompat.MediaItem> result = new ArrayList<>();
+                        (strings, mediaWithAlbumList) -> {
+                            List<MediaBrowserCompat.MediaItem> result = new ArrayList<>();
 
-                                for (String folder : strings) {
-                                    result.add(createBrowsableMediaItemForFolder(folder));
-                                }
-
-                                for (MediaWithAlbum media : mediaWithAlbumList) {
-                                    result.add(createMediaItem(media, folder));
-                                }
-
-                                return result;
+                            for (String folder1 : strings) {
+                                result.add(createBrowsableMediaItemForFolder(folder1));
                             }
+
+                            for (MediaWithAlbum media : mediaWithAlbumList) {
+                                result.add(createMediaItem(media, folder));
+                            }
+
+                            return result;
                         });
             }
 
@@ -289,23 +245,18 @@ public class MusicProvider {
             return Flowable.combineLatest(
                     getSubFolders(folder),
                     getMusicsByFolder(folder),
-                    new BiFunction<List<String>, List<MediaWithAlbum>, List<MediaBrowserCompat.MediaItem>>() {
-                        @Override
-                        public List<MediaBrowserCompat.MediaItem> apply(
-                                @io.reactivex.annotations.NonNull List<String> strings,
-                                @io.reactivex.annotations.NonNull List<MediaWithAlbum> mediaWithAlbumList) throws Exception {
-                            List<MediaBrowserCompat.MediaItem> result = new ArrayList<>();
+                    (strings, mediaWithAlbumList) -> {
+                        List<MediaBrowserCompat.MediaItem> result = new ArrayList<>();
 
-                            for (String folder : strings) {
-                                result.add(createBrowsableMediaItemForFolder(folder));
-                            }
-
-                            for (MediaWithAlbum media : mediaWithAlbumList) {
-                                result.add(createMediaItem(media, folder));
-                            }
-
-                            return result;
+                        for (String folder12 : strings) {
+                            result.add(createBrowsableMediaItemForFolder(folder12));
                         }
+
+                        for (MediaWithAlbum media : mediaWithAlbumList) {
+                            result.add(createMediaItem(media, folder));
+                        }
+
+                        return result;
                     });
         }
 
