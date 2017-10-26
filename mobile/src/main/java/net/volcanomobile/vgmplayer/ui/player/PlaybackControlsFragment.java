@@ -101,12 +101,7 @@ public class PlaybackControlsFragment extends Fragment {
     private TextView mLine3;
     private final Handler mHandler = new Handler();
 
-    private final Runnable mUpdateProgressTask = new Runnable() {
-        @Override
-        public void run() {
-            updateProgress();
-        }
-    };
+    private final Runnable mUpdateProgressTask = () -> updateProgress();
 
     private final ScheduledExecutorService mExecutorService =
             Executors.newSingleThreadScheduledExecutor();
@@ -206,74 +201,59 @@ public class PlaybackControlsFragment extends Fragment {
         mShuffle = (ImageButton) rootView.findViewById(R.id.shuffle);
         mRepeat = (ImageButton) rootView.findViewById(R.id.repeat);
 
-        mQueue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Drawable queueDrawable = ContextCompat.getDrawable(getContext(), mPlayingQueueResourceId);
-                Fragment queueFragment = getChildFragmentManager().findFragmentById(R.id.queue_container);
+        mQueue.setOnClickListener(v -> {
+            Drawable queueDrawable = ContextCompat.getDrawable(getContext(), mPlayingQueueResourceId);
+            Fragment queueFragment = getChildFragmentManager().findFragmentById(R.id.queue_container);
 
-                if (queueFragment == null) {
-                    queueFragment = new QueueFragment();
-                    getChildFragmentManager().beginTransaction()
-                            .setCustomAnimations(R.anim.queue_fade_in, R.anim.queue_fade_out)
-                            .replace(R.id.queue_container, queueFragment).commit();
-                    queueDrawable = DrawableCompat.wrap(queueDrawable);
-                    DrawableCompat.setTint(queueDrawable.mutate(), mColorButtonAccent);
-                } else {
-                    getChildFragmentManager().beginTransaction()
-                            .setCustomAnimations(R.anim.queue_fade_in, R.anim.queue_fade_out)
-                            .remove(queueFragment).commit();
-                }
+            if (queueFragment == null) {
+                queueFragment = new QueueFragment();
+                getChildFragmentManager().beginTransaction()
+                        .setCustomAnimations(R.anim.queue_fade_in, R.anim.queue_fade_out)
+                        .replace(R.id.queue_container, queueFragment).commit();
+                queueDrawable = DrawableCompat.wrap(queueDrawable);
+                DrawableCompat.setTint(queueDrawable.mutate(), mColorButtonAccent);
+            } else {
+                getChildFragmentManager().beginTransaction()
+                        .setCustomAnimations(R.anim.queue_fade_in, R.anim.queue_fade_out)
+                        .remove(queueFragment).commit();
+            }
 
-                mQueue.setImageDrawable(queueDrawable);
+            mQueue.setImageDrawable(queueDrawable);
+        });
+
+        mShuffle.setOnClickListener(v -> {
+            MediaControllerCompat controller = MediaControllerCompat.getMediaController(getActivity());
+            if (controller != null) {
+                MediaControllerCompat.TransportControls controls13 = controller.getTransportControls();
+                int currentMode = controller.getShuffleMode();
+                controls13.setShuffleMode(currentMode != PlaybackStateCompat.SHUFFLE_MODE_NONE
+                        ? PlaybackStateCompat.SHUFFLE_MODE_NONE
+                        : PlaybackStateCompat.SHUFFLE_MODE_ALL);
             }
         });
 
-        mShuffle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MediaControllerCompat controller = MediaControllerCompat.getMediaController(getActivity());
-                if (controller != null) {
-                    MediaControllerCompat.TransportControls controls = controller.getTransportControls();
-                    int currentMode = controller.getShuffleMode();
-                    controls.setShuffleMode(currentMode != PlaybackStateCompat.SHUFFLE_MODE_NONE
-                            ? PlaybackStateCompat.SHUFFLE_MODE_NONE
-                            : PlaybackStateCompat.SHUFFLE_MODE_ALL);
-                }
+        mRepeat.setOnClickListener(v -> {
+            MediaControllerCompat controller = MediaControllerCompat.getMediaController(getActivity());
+            if (controller != null) {
+                MediaControllerCompat.TransportControls controls12 = controller.getTransportControls();
+                int repeatMode = (controller.getRepeatMode() + 1) % 3;
+                controls12.setRepeatMode(repeatMode);
             }
         });
 
-        mRepeat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MediaControllerCompat controller = MediaControllerCompat.getMediaController(getActivity());
-                if (controller != null) {
-                    MediaControllerCompat.TransportControls controls = controller.getTransportControls();
-                    int repeatMode = (controller.getRepeatMode() + 1) % 3;
-                    controls.setRepeatMode(repeatMode);
-                }
+        mSkipNext.setOnClickListener(v -> {
+            MediaControllerCompat controller = MediaControllerCompat.getMediaController(getActivity());
+            if (controller != null) {
+                MediaControllerCompat.TransportControls transportControls = controller.getTransportControls();
+                transportControls.skipToNext();
             }
         });
 
-        mSkipNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MediaControllerCompat controller = MediaControllerCompat.getMediaController(getActivity());
-                if (controller != null) {
-                    MediaControllerCompat.TransportControls transportControls = controller.getTransportControls();
-                    transportControls.skipToNext();
-                }
-            }
-        });
-
-        mSkipPrev.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MediaControllerCompat controller = MediaControllerCompat.getMediaController(getActivity());
-                if (controller != null) {
-                    MediaControllerCompat.TransportControls controls = controller.getTransportControls();
-                    controls.skipToPrevious();
-                }
+        mSkipPrev.setOnClickListener(v -> {
+            MediaControllerCompat controller = MediaControllerCompat.getMediaController(getActivity());
+            if (controller != null) {
+                MediaControllerCompat.TransportControls controls1 = controller.getTransportControls();
+                controls1.skipToPrevious();
             }
         });
 
@@ -509,29 +489,26 @@ public class PlaybackControlsFragment extends Fragment {
                 ? INVISIBLE : VISIBLE );
     }
 
-    private final View.OnClickListener mButtonListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            MediaControllerCompat controller = MediaControllerCompat.getMediaController(getActivity());
-            PlaybackStateCompat stateObj = controller.getPlaybackState();
-            final int state = stateObj == null ?
-                    PlaybackStateCompat.STATE_NONE : stateObj.getState();
-            LogHelper.d(TAG, "Button pressed, in state " + state);
-            switch (v.getId()) {
-                case R.id.play_pause:
-                case R.id.bottom_play_pause:
-                    LogHelper.d(TAG, "Play button pressed, in state " + state);
-                    if (state == PlaybackStateCompat.STATE_PAUSED ||
-                            state == PlaybackStateCompat.STATE_STOPPED ||
-                            state == PlaybackStateCompat.STATE_NONE) {
-                        playMedia();
-                    } else if (state == PlaybackStateCompat.STATE_PLAYING ||
-                            state == PlaybackStateCompat.STATE_BUFFERING ||
-                            state == PlaybackStateCompat.STATE_CONNECTING) {
-                        pauseMedia();
-                    }
-                    break;
-            }
+    private final View.OnClickListener mButtonListener = v -> {
+        MediaControllerCompat controller = MediaControllerCompat.getMediaController(getActivity());
+        PlaybackStateCompat stateObj = controller.getPlaybackState();
+        final int state = stateObj == null ?
+                PlaybackStateCompat.STATE_NONE : stateObj.getState();
+        LogHelper.d(TAG, "Button pressed, in state " + state);
+        switch (v.getId()) {
+            case R.id.play_pause:
+            case R.id.bottom_play_pause:
+                LogHelper.d(TAG, "Play button pressed, in state " + state);
+                if (state == PlaybackStateCompat.STATE_PAUSED ||
+                        state == PlaybackStateCompat.STATE_STOPPED ||
+                        state == PlaybackStateCompat.STATE_NONE) {
+                    playMedia();
+                } else if (state == PlaybackStateCompat.STATE_PLAYING ||
+                        state == PlaybackStateCompat.STATE_BUFFERING ||
+                        state == PlaybackStateCompat.STATE_CONNECTING) {
+                    pauseMedia();
+                }
+                break;
         }
     };
 
@@ -582,12 +559,7 @@ public class PlaybackControlsFragment extends Fragment {
         stopSeekbarUpdate();
         if (!mExecutorService.isShutdown()) {
             mScheduleFuture = mExecutorService.scheduleAtFixedRate(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            mHandler.post(mUpdateProgressTask);
-                        }
-                    }, PROGRESS_UPDATE_INITIAL_INTERVAL,
+                    () -> mHandler.post(mUpdateProgressTask), PROGRESS_UPDATE_INITIAL_INTERVAL,
                     PROGRESS_UPDATE_INTERNAL, TimeUnit.MILLISECONDS);
         }
     }

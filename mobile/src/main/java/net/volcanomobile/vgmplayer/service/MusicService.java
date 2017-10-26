@@ -440,12 +440,12 @@ public class MusicService extends MediaBrowserServiceCompat implements
     }
 
     @Override
-    public void onSetShuffleMode(int shuffleMode) {
+    public void onSetShuffleMode(@PlaybackStateCompat.ShuffleMode int shuffleMode) {
         mSession.setShuffleMode(shuffleMode);
     }
 
     @Override
-    public void onSetRepeatMode(int mode) {
+    public void onSetRepeatMode(@PlaybackStateCompat.RepeatMode int mode) {
         mSession.setRepeatMode(mode);
     }
 

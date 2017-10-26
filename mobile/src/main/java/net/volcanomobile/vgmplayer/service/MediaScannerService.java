@@ -69,25 +69,19 @@ public final class MediaScannerService extends IntentService {
     public MediaScannerService() {
         super("MediaScannerService");
 
-        midiFilter = new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                if(file.isDirectory()) {
-                    return !file.getAbsolutePath().endsWith("/Android");
-                }
-                String name = file.getName().toLowerCase();
-                return name.endsWith(".vgm") || name.endsWith(".vgz");
+        midiFilter = file -> {
+            if(file.isDirectory()) {
+                return !file.getAbsolutePath().endsWith("/Android");
             }
+            String name = file.getName().toLowerCase();
+            return name.endsWith(".vgm") || name.endsWith(".vgz");
         };
-        artFilter = new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                if(file.isDirectory()) {
-                    return false;
-                }
-                String name = file.getName().toLowerCase();
-                return name.endsWith(".png") || name.endsWith(".jpg");
+        artFilter = file -> {
+            if(file.isDirectory()) {
+                return false;
             }
+            String name = file.getName().toLowerCase();
+            return name.endsWith(".png") || name.endsWith(".jpg");
         };
 
         mThumbOptions = new BitmapFactory.Options();

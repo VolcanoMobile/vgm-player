@@ -63,12 +63,7 @@ public class EqualizerFragment extends Fragment {
         mModel.setHasEqualizer(AudioEffects.hasEqualizer() && mAudioEffects.getSessionId() != 0);
 
         binding.switchBassBoost.setOnCheckedChangeListener(
-                new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        setBassBoostEnabled(isChecked);
-                    }
-                }
+                (buttonView, isChecked) -> setBassBoostEnabled(isChecked)
         );
 
         binding.seekBarBassBoost.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -88,20 +83,10 @@ public class EqualizerFragment extends Fragment {
             }
         });
 
-        binding.equalizerView.setOnBandChangeListener(new EqualizerView.OnBandChangeListener() {
-            @Override
-            public void onBandChange(short band, short value) {
-                binding.presets.setSelection(0);
-            }
-        });
+        binding.equalizerView.setOnBandChangeListener((band, value) -> binding.presets.setSelection(0));
 
         binding.switchEqualizer.setOnCheckedChangeListener(
-                new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        setEqualizerEnabled(isChecked);
-                    }
-                }
+                (buttonView, isChecked) -> setEqualizerEnabled(isChecked)
         );
 
         mBinding = binding;
@@ -142,45 +127,42 @@ public class EqualizerFragment extends Fragment {
     private final Observer mAudioEffectsObserver = new Observer() {
         @Override
         public void update(Observable o, Object arg) {
-            Handlers.runOnMainThread(new Runnable() {
-                @Override
-                public void run() {
-                    mBinding.equalizerView.setEqualizer(mAudioEffects.getEqualizer());
-                    mModel.setHasBassBoost(AudioEffects.hasBassBoost() && mAudioEffects.getSessionId() != 0);
-                    mModel.setHasEqualizer(AudioEffects.hasEqualizer() && mAudioEffects.getSessionId() != 0);
+            Handlers.runOnMainThread(() -> {
+                mBinding.equalizerView.setEqualizer(mAudioEffects.getEqualizer());
+                mModel.setHasBassBoost(AudioEffects.hasBassBoost() && mAudioEffects.getSessionId() != 0);
+                mModel.setHasEqualizer(AudioEffects.hasEqualizer() && mAudioEffects.getSessionId() != 0);
 
-                    if (AudioEffects.hasEqualizer()) {
-                        if (mAudioEffects.getEqualizer() != null) {
-                            final Equalizer equalizer = mAudioEffects.getEqualizer();
-                            mModel.setEqualizerEnabled(mAudioEffects.isEqualizerEnabled());
+                if (AudioEffects.hasEqualizer()) {
+                    if (mAudioEffects.getEqualizer() != null) {
+                        final Equalizer equalizer = mAudioEffects.getEqualizer();
+                        mModel.setEqualizerEnabled(mAudioEffects.isEqualizerEnabled());
 
-                            List<String> presets = new ArrayList<>();
-                            presets.add(getString(R.string.custom_preset));
-                            for (short i = 0; i < equalizer.getNumberOfPresets(); i++) {
-                                presets.add(equalizer.getPresetName(i));
+                        List<String> presets = new ArrayList<>();
+                        presets.add(getString(R.string.custom_preset));
+                        for (short i = 0; i < equalizer.getNumberOfPresets(); i++) {
+                            presets.add(equalizer.getPresetName(i));
+                        }
+
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, presets);
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        mBinding.presets.setAdapter(adapter);
+                        mBinding.presets.setSelection(equalizer.getCurrentPreset() + 1);
+
+                        mBinding.presets.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                if (position != 0) {
+                                    equalizer.usePreset((short) (position - 1));
+                                    mAudioEffects.saveEqualizerSettings(equalizer.getProperties());
+                                    mBinding.equalizerView.rebuild();
+                                }
                             }
 
-                            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, presets);
-                            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            mBinding.presets.setAdapter(adapter);
-                            mBinding.presets.setSelection(equalizer.getCurrentPreset() + 1);
+                            @Override
+                            public void onNothingSelected(AdapterView<?> parent) {
 
-                            mBinding.presets.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                @Override
-                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                    if (position != 0) {
-                                        equalizer.usePreset((short) (position - 1));
-                                        mAudioEffects.saveEqualizerSettings(equalizer.getProperties());
-                                        mBinding.equalizerView.rebuild();
-                                    }
-                                }
-
-                                @Override
-                                public void onNothingSelected(AdapterView<?> parent) {
-
-                                }
-                            });
-                        }
+                            }
+                        });
                     }
                 }
             });

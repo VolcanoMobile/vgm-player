@@ -107,12 +107,7 @@ public abstract class ActionBarActivity extends AppCompatActivity {
     };
 
     private final FragmentManager.OnBackStackChangedListener mBackStackChangedListener =
-        new FragmentManager.OnBackStackChangedListener() {
-            @Override
-            public void onBackStackChanged() {
-                updateDrawerToggle();
-            }
-        };
+            () -> updateDrawerToggle();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -247,13 +242,10 @@ public abstract class ActionBarActivity extends AppCompatActivity {
 
     private void populateDrawerItems(NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                        mItemToOpenWhenDrawerCloses = menuItem.getItemId();
-                        mDrawerLayout.closeDrawers();
-                        return true;
-                    }
+                menuItem -> {
+                    mItemToOpenWhenDrawerCloses = menuItem.getItemId();
+                    mDrawerLayout.closeDrawers();
+                    return true;
                 });
         if (MusicPlayerActivity.class.isAssignableFrom(getClass())) {
             navigationView.setCheckedItem(R.id.navigation_allmusic);

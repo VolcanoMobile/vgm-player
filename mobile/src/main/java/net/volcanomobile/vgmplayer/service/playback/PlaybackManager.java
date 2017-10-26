@@ -155,7 +155,7 @@ public class PlaybackManager implements Playback.Callback {
                 PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM |
                 PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
                 PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
-                PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE_ENABLED |
+                PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE |
                 PlaybackStateCompat.ACTION_SET_REPEAT_MODE;
     }
 
@@ -383,7 +383,7 @@ public class PlaybackManager implements Playback.Callback {
         }
 
         @Override
-        public void onSetShuffleMode(int shuffleMode) {
+        public void onSetShuffleMode(@PlaybackStateCompat.ShuffleMode int shuffleMode) {
             LogHelper.d(TAG, "onSetShuffleMode: ", shuffleMode);
 
             mServiceCallback.onSetShuffleMode(shuffleMode);
@@ -393,7 +393,7 @@ public class PlaybackManager implements Playback.Callback {
         }
 
         @Override
-        public void onSetRepeatMode(int repeatMode) {
+        public void onSetRepeatMode(@PlaybackStateCompat.RepeatMode int repeatMode) {
             LogHelper.d(TAG, "onSetRepeatMode: ", repeatMode);
 
             mRepeatMode = repeatMode;
@@ -464,8 +464,8 @@ public class PlaybackManager implements Playback.Callback {
 
         void onPlaybackStateUpdated(PlaybackStateCompat newState);
 
-        void onSetShuffleMode(int shuffleMode);
+        void onSetShuffleMode(@PlaybackStateCompat.ShuffleMode int shuffleMode);
 
-        void onSetRepeatMode(int mode);
+        void onSetRepeatMode(@PlaybackStateCompat.RepeatMode int mode);
     }
 }

@@ -105,14 +105,11 @@ public abstract class BaseActivity extends ActionBarActivity implements MediaBro
         mBottomSheetBehavior.setBottomSheetCallback(mBottomSheetCallback);
 
         View collapsedView = findViewById(R.id.collapsed_view);
-        collapsedView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                } else {
-                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                }
+        collapsedView.setOnClickListener(v -> {
+            if(mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            } else {
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
 

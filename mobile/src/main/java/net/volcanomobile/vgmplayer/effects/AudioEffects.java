@@ -257,12 +257,7 @@ public final class AudioEffects extends Observable {
     }
 
     private void persistBassBoostSettingsAsync() {
-        Handlers.runOnIoThread(new Runnable() {
-            @Override
-            public void run() {
-                persistBassBoostSettingsBlocking();
-            }
-        });
+        Handlers.runOnIoThread(() -> persistBassBoostSettingsBlocking());
     }
 
     private void persistBassBoostSettingsBlocking() {
@@ -272,12 +267,7 @@ public final class AudioEffects extends Observable {
     }
 
     private void persistEqualizerSettingsAsync() {
-        Handlers.runOnIoThread(new Runnable() {
-            @Override
-            public void run() {
-                persistEqualizerSettingsBlocking();
-            }
-        });
+        Handlers.runOnIoThread(() -> persistEqualizerSettingsBlocking());
     }
 
     private void persistEqualizerSettingsBlocking() {

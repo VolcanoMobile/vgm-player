@@ -88,20 +88,17 @@ public class AudioPreviewActivity extends FragmentActivity {
         mDuration = 0;
 
         mPlayPause = (ImageButton) findViewById(R.id.play_pause);
-        mPlayPause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mPlayer.getPlayWhenReady()) {
-                    mPlayer.setPlayWhenReady(false);
-                    stopSeekbarUpdate();
-                    mPlayPause.setImageDrawable(
-                            ContextCompat.getDrawable(AudioPreviewActivity.this, R.drawable.ic_play_arrow_black_36dp));
-                } else {
-                    scheduleSeekbarUpdate();
-                    mPlayer.setPlayWhenReady(true);
-                    mPlayPause.setImageDrawable(
-                            ContextCompat.getDrawable(AudioPreviewActivity.this, R.drawable.ic_pause_black_36dp));
-                }
+        mPlayPause.setOnClickListener(v -> {
+            if (mPlayer.getPlayWhenReady()) {
+                mPlayer.setPlayWhenReady(false);
+                stopSeekbarUpdate();
+                mPlayPause.setImageDrawable(
+                        ContextCompat.getDrawable(AudioPreviewActivity.this, R.drawable.ic_play_arrow_black_36dp));
+            } else {
+                scheduleSeekbarUpdate();
+                mPlayer.setPlayWhenReady(true);
+                mPlayPause.setImageDrawable(
+                        ContextCompat.getDrawable(AudioPreviewActivity.this, R.drawable.ic_pause_black_36dp));
             }
         });
 

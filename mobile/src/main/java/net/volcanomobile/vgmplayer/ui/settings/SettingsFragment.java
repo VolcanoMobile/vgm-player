@@ -37,32 +37,26 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         Preference rootFolderPreference = findPreference(getString(R.string.pref_root_folder_key));
         String rootFolder = PreferencesHelper.getInstance(getContext()).getRootFolder();
         rootFolderPreference.setSummary(TextUtils.isEmpty(rootFolder) ? getString(R.string.root_not_set) : rootFolder);
-        rootFolderPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                showRootFolderSelector();
-                return true;
-            }
+        rootFolderPreference.setOnPreferenceClickListener(preference -> {
+            showRootFolderSelector();
+            return true;
         });
 
         Preference themePreference = findPreference("theme_id");
         SettingsActivity.bindPreferenceSummaryToValue(themePreference);
         final Preference.OnPreferenceChangeListener themePreferenceBinding = themePreference.getOnPreferenceChangeListener();
-        findPreference("theme_id").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                themePreferenceBinding.onPreferenceChange(preference, newValue);
+        findPreference("theme_id").setOnPreferenceChangeListener((preference, newValue) -> {
+            themePreferenceBinding.onPreferenceChange(preference, newValue);
 
-                String value = (String) newValue;
-                Theme newTheme = Theme.ofMarshallingId(Integer.parseInt(value));
+            String value = (String) newValue;
+            Theme newTheme = Theme.ofMarshallingId(Integer.parseInt(value));
 
-                if(newTheme != null) {
-                    Application.getInstance().setCurrentTheme(newTheme);
-                    return true;
-                }
-
-                return false;
+            if(newTheme != null) {
+                Application.getInstance().setCurrentTheme(newTheme);
+                return true;
             }
+
+            return false;
         });
 
         Preference versionPreference = findPreference(getString(R.string.pref_version_key));
