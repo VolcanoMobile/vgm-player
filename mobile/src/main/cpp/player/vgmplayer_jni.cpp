@@ -51,6 +51,7 @@ Java_net_volcanomobile_vgmplayer_service_player_VgmPlayerInternal_nativeInit(JNI
 
     VGMPlay_Init();
 
+/*
     CHIP_OPTS* ym2612 = (CHIP_OPTS*)&ChipOpts[0x00] + 0x02; // YM2612
     ym2612->EmuCore = 2; // Nuked OPN2
 
@@ -59,6 +60,7 @@ Java_net_volcanomobile_vgmplayer_service_player_VgmPlayerInternal_nativeInit(JNI
 
     CHIP_OPTS* ym3812 = (CHIP_OPTS*)&ChipOpts[0x00] + 0x0C; // YM3812
     ym3812->EmuCore = 1; // MAME
+*/
 
     VGMPlay_Init2();
     return 0;

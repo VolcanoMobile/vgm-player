@@ -34,7 +34,7 @@ allprojects {
 
 // Define versions in a single place
 ext {
-    versionCode = 50
+    versionCode = 51
     versionName = "1.4.4"
 
     // Sdk and tools
