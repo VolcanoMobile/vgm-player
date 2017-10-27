@@ -22,6 +22,7 @@ import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.PowerManager;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
@@ -82,6 +83,8 @@ public class CastPlayback implements Playback {
     private final RemoteMediaClient.Listener mRemoteMediaClientListener;
 
     private final WifiManager.WifiLock mWifiLock;
+    private final PowerManager.WakeLock mCpuLock;
+
     private HttpServer mHttpServer;
 
     /** The current PlaybackState */
@@ -101,15 +104,34 @@ public class CastPlayback implements Playback {
                 .getCurrentCastSession();
         mRemoteMediaClient = castSession.getRemoteMediaClient();
         mRemoteMediaClientListener = new CastMediaClientListener();
-        mWifiLock = ((WifiManager) context.getSystemService(Context.WIFI_SERVICE))
-                .createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "vgmplayer_lock");
+
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager != null) {
+            mWifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "vgmplayer_lock");
+        } else {
+            mWifiLock = null;
+        }
+
+        PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        if (powerManager != null) {
+            mCpuLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "vgmplayer_lock");
+        } else {
+            mCpuLock = null;
+        }
     }
 
+    @SuppressLint("WakelockTimeout")
     @Override
     public void start() {
         mRemoteMediaClient.addListener(mRemoteMediaClientListener);
 
-        mWifiLock.acquire();
+        if (mWifiLock != null) {
+            mWifiLock.acquire();
+        }
+
+        if (mCpuLock != null) {
+            mCpuLock.acquire();
+        }
 
         try {
             mHttpServer = new HttpServer(mAppContext);
@@ -132,8 +154,12 @@ public class CastPlayback implements Playback {
             mHttpServer = null;
         }
 
-        if (mWifiLock.isHeld()) {
+        if (mWifiLock != null && mWifiLock.isHeld()) {
             mWifiLock.release();
+        }
+
+        if (mCpuLock != null && mCpuLock.isHeld()) {
+            mCpuLock.release();
         }
     }
 
