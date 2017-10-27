@@ -63,4 +63,8 @@
 
     <string name="scanner_notification_channel" translatable="false">VGM_SANNER_Channel_ID</string>
     <string name="scanner_notification_channel_description" translatable="false">Channel ID for VGM Scanner</string>
+
+    <string name="media_route_menu_title">Play on…</string>
+    <string name="touch_to_cast">Touch to connect to a Google Cast device</string>
+
 </resources>
