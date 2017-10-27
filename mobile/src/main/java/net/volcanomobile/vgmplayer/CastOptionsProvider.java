@@ -1,6 +1,7 @@
 package net.volcanomobile.vgmplayer;
 
 import android.content.Context;
+import android.support.annotation.Keep;
 
 import com.google.android.gms.cast.CastMediaControlIntent;
 import com.google.android.gms.cast.framework.CastOptions;
@@ -12,6 +13,7 @@ import java.util.List;
 /**
  * Specify receiver application ID for cast
  */
+@Keep
 public class CastOptionsProvider implements OptionsProvider {
 
     @Override
