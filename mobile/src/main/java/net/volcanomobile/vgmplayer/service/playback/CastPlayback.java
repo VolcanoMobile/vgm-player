@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.volcanomobile.vgmplayer.service.player;
+package net.volcanomobile.vgmplayer.service.playback;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -37,7 +37,6 @@ import com.google.android.gms.common.images.WebImage;
 
 import net.volcanomobile.vgmplayer.Application;
 import net.volcanomobile.vgmplayer.model.MusicProvider;
-import net.volcanomobile.vgmplayer.service.playback.Playback;
 import net.volcanomobile.vgmplayer.utils.LogHelper;
 import net.volcanomobile.vgmplayer.utils.MediaIDHelper;
 

@@ -60,7 +60,7 @@ import net.volcanomobile.vgmplayer.service.playback.LocalPlayback;
 import net.volcanomobile.vgmplayer.service.playback.Playback;
 import net.volcanomobile.vgmplayer.service.playback.PlaybackManager;
 import net.volcanomobile.vgmplayer.service.playback.QueueManager;
-import net.volcanomobile.vgmplayer.service.player.CastPlayback;
+import net.volcanomobile.vgmplayer.service.playback.CastPlayback;
 import net.volcanomobile.vgmplayer.ui.player.MusicPlayerActivity;
 import net.volcanomobile.vgmplayer.utils.CarHelper;
 import net.volcanomobile.vgmplayer.utils.LogHelper;

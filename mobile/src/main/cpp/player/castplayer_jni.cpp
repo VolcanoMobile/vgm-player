@@ -38,7 +38,7 @@ extern UINT32 FadeTime;
 static char tmp[BLOCK_SIZE * 2]; // must match VGMPlayer::BUFFER_SIZE
 
 extern "C" JNIEXPORT void JNICALL
-Java_net_volcanomobile_vgmplayer_service_player_CastPlayback_nativeRelease(JNIEnv *env, jclass type)
+Java_net_volcanomobile_vgmplayer_service_playback_CastPlayback_nativeRelease(JNIEnv *env, jclass type)
 {
 	StopVGM();
 	CloseVGMFile();
@@ -46,7 +46,7 @@ Java_net_volcanomobile_vgmplayer_service_player_CastPlayback_nativeRelease(JNIEn
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_net_volcanomobile_vgmplayer_service_player_CastPlayback_nativePrepare(JNIEnv *env, jclass type, jstring filename)
+Java_net_volcanomobile_vgmplayer_service_playback_CastPlayback_nativePrepare(JNIEnv *env, jclass type, jstring filename)
 {
 	VGMMaxLoop = 2;
 	FadeTime = 5000;
@@ -68,7 +68,7 @@ Java_net_volcanomobile_vgmplayer_service_player_CastPlayback_nativePrepare(JNIEn
 }
 
 extern "C" JNIEXPORT jint JNICALL
-Java_net_volcanomobile_vgmplayer_service_player_CastPlayback_nativeFillBuffer(JNIEnv *env, jclass type, jbyteArray buffer)
+Java_net_volcanomobile_vgmplayer_service_playback_CastPlayback_nativeFillBuffer(JNIEnv *env, jclass type, jbyteArray buffer)
 {
     UINT32 RetSamples;
 
