@@ -455,7 +455,8 @@ public class CastPlayback implements Playback {
 
             if(uri.equals("/track")) {
                 try {
-                    return newChunkedResponse(Response.Status.OK, MIME_TYPE_AUDIO, new EncoderInputStream(source));
+                    Uri file = Uri.parse(source);
+                    return newChunkedResponse(Response.Status.OK, MIME_TYPE_AUDIO, new EncoderInputStream(file.getPath()));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
