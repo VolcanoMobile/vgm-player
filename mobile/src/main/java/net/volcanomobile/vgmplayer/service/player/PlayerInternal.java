@@ -304,7 +304,12 @@ abstract class PlayerInternal implements Handler.Callback {
                 initialized = true;
             }
 
-            stopInternal();
+            resetInternal();
+            abstractNativeReset();
+            if (audioTrack.getPlayState() == AudioTrack.PLAYSTATE_PLAYING) {
+                audioTrack.pause();
+            }
+            audioTrack.flush();
 
             String filePath = uri.getPath();
 
