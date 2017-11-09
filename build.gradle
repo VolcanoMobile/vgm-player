@@ -34,15 +34,15 @@ allprojects {
 
 // Define versions in a single place
 ext {
-    versionCode = 54
-    versionName = "1.5.0"
+    versionCode = 55
+    versionName = "1.5.1"
 
     // Sdk and tools
     minSdkVersion = 17
     targetSdkVersion = 26
     compileSdkVersion = 26
     buildToolsVersion = '26.0.2'
-    architectureComponentsVersion = "1.0.0-rc1"
+    architectureComponentsVersion = "1.0.0"
 
     // App dependencies
     supportLibraryVersion = '27.0.0'

@@ -50,37 +50,22 @@ class VgmPlayerInternal extends PlayerInternal {
         return true;
     }
 
-    @Override
-    void abstractNativeRelease() {
-        nativeRelease();
-    }
+    private native int nativeInit();
 
     @Override
-    void abstractNativeReset() {
-        nativeReset();
-    }
+    native int nativePrepare(String fileName);
 
     @Override
-    int abstractNativeFillBuffer(ByteBuffer buffer) {
-        return nativeFillBuffer(buffer);
-    }
+    native void nativeRelease();
 
     @Override
-    int abstractNativePrepare(String fileName) {
-        return nativePrepare(fileName);
-    }
+    native int nativeStart();
 
     @Override
-    int abstractNativeStart() {
-        return nativeStart();
-    }
+    native void nativeReset();
 
-    private static native int nativeInit();
-    private static native int nativePrepare(String fileName);
-    private static native void nativeRelease();
-    private static native int nativeStart();
-    private static native void nativeReset();
-    private static native int nativeFillBuffer(ByteBuffer buffer);
-    private static native int nativeGetCurrentPosition();
-    private static native void nativeSeekTo(int tick);
+    @Override
+    native int nativeFillBuffer(ByteBuffer buffer);
+    private native int nativeGetCurrentPosition();
+    private native void nativeSeekTo(int tick);
 }

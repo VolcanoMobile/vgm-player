@@ -139,11 +139,11 @@ abstract class PlayerInternal implements Handler.Callback {
     abstract boolean canSeek();
     abstract long getCurrentPosition();
     abstract void seekToInternal(long positionMs);
-    abstract void abstractNativeRelease();
-    abstract void abstractNativeReset();
-    abstract int abstractNativeFillBuffer(ByteBuffer buffer);
-    abstract int abstractNativePrepare(String fileName);
-    abstract int abstractNativeStart();
+    abstract void nativeRelease();
+    abstract void nativeReset();
+    abstract int nativeFillBuffer(ByteBuffer buffer);
+    abstract int nativePrepare(String fileName);
+    abstract int nativeStart();
     abstract void init();
 
     void setVolume(float volume) {
@@ -237,7 +237,7 @@ abstract class PlayerInternal implements Handler.Callback {
 
             // fill buffer
             buffer.clear();
-            int size = abstractNativeFillBuffer(buffer);
+            int size = nativeFillBuffer(buffer);
             buffer.limit(size);
         }
     }
@@ -272,7 +272,7 @@ abstract class PlayerInternal implements Handler.Callback {
     void stopInternal() {
         resetInternal();
         setState(VgmPlayer.STATE_IDLE);
-        abstractNativeReset();
+        nativeReset();
 
         if (audioTrack.getPlayState() == AudioTrack.PLAYSTATE_PLAYING) {
             audioTrack.pause();
@@ -286,7 +286,7 @@ abstract class PlayerInternal implements Handler.Callback {
             audioTrack.pause();
         }
         audioTrack.release();
-        abstractNativeRelease();
+        nativeRelease();
         synchronized (this) {
             released = true;
             notifyAll();
@@ -305,7 +305,7 @@ abstract class PlayerInternal implements Handler.Callback {
             }
 
             resetInternal();
-            abstractNativeReset();
+            nativeReset();
             if (audioTrack.getPlayState() == AudioTrack.PLAYSTATE_PLAYING) {
                 audioTrack.pause();
             }
@@ -313,13 +313,13 @@ abstract class PlayerInternal implements Handler.Callback {
 
             String filePath = uri.getPath();
 
-            if(abstractNativePrepare(filePath) != 0) {
+            if(nativePrepare(filePath) != 0) {
                 eventHandler.obtainMessage(MSG_ERROR, new RuntimeException("Prepare failed")).sendToTarget();
                 stopInternal();
                 return;
             }
 
-            if(abstractNativeStart() != 0) {
+            if(nativeStart() != 0) {
                 eventHandler.obtainMessage(MSG_ERROR, new RuntimeException("Start failed")).sendToTarget();
                 stopInternal();
                 return;
@@ -330,7 +330,7 @@ abstract class PlayerInternal implements Handler.Callback {
 
             // fill buffer
             buffer.clear();
-            int size = abstractNativeFillBuffer(buffer);
+            int size = nativeFillBuffer(buffer);
             buffer.limit(size);
 
         } else if (state == VgmPlayer.STATE_READY) {
@@ -338,7 +338,7 @@ abstract class PlayerInternal implements Handler.Callback {
             if (handleBuffer(buffer)) {
                 buffer.clear();
                 delay = 0;
-                int size = abstractNativeFillBuffer(buffer);
+                int size = nativeFillBuffer(buffer);
                 if (size <= 0) {
                     blockUntilCompletion(audioTrack);
                     audioTrack.stop();
