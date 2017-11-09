@@ -75,7 +75,7 @@ public class VgmPlayer {
     }
 
     public void prepare(Uri uri) {
-        playbackState = STATE_IDLE;
+        playbackState = STATE_BUFFERING;
         internalPlayer.prepare(uri);
     }
 
