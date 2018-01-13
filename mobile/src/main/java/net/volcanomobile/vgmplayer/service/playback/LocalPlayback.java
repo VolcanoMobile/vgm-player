@@ -363,7 +363,9 @@ public class LocalPlayback implements Playback {
 
     private void unregisterAudioNoisyReceiver() {
         if (mAudioNoisyReceiverRegistered) {
-            mContext.unregisterReceiver(mAudioNoisyReceiver);
+            try {
+                mContext.unregisterReceiver(mAudioNoisyReceiver);
+            } catch (Exception ignored) {}
             mAudioNoisyReceiverRegistered = false;
         }
     }
