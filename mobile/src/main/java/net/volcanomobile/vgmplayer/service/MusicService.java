@@ -35,6 +35,7 @@ import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaBrowserCompat.MediaItem;
 import android.support.v4.media.MediaBrowserServiceCompat;
 import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -56,11 +57,11 @@ import net.volcanomobile.vgmplayer.Application;
 import net.volcanomobile.vgmplayer.BuildConfig;
 import net.volcanomobile.vgmplayer.R;
 import net.volcanomobile.vgmplayer.model.MusicProvider;
+import net.volcanomobile.vgmplayer.service.playback.CastPlayback;
 import net.volcanomobile.vgmplayer.service.playback.LocalPlayback;
 import net.volcanomobile.vgmplayer.service.playback.Playback;
 import net.volcanomobile.vgmplayer.service.playback.PlaybackManager;
 import net.volcanomobile.vgmplayer.service.playback.QueueManager;
-import net.volcanomobile.vgmplayer.service.playback.CastPlayback;
 import net.volcanomobile.vgmplayer.ui.player.MusicPlayerActivity;
 import net.volcanomobile.vgmplayer.utils.CarHelper;
 import net.volcanomobile.vgmplayer.utils.LogHelper;
@@ -266,6 +267,9 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
         // Start a new MediaSession
         mSession = new MediaSessionCompat(this, "MusicService");
+        mSession.setRepeatMode(PlaybackStateCompat.REPEAT_MODE_NONE);
+        mSession.setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_NONE);
+        mSession.setRatingType(RatingCompat.RATING_NONE);
 
         setSessionToken(mSession.getSessionToken());
         mSession.setCallback(mPlaybackManager.getMediaSessionCallback());
